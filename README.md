@@ -11,4 +11,5 @@ A Python tool to automatically fetch BibTeX citations for academic papers from C
 - 📁 **Batch processing**: Process multiple papers from a text file
 - 🎯 **Smart matching**: Cleans and normalizes titles for better search results
 
-
+## How to use 
+Add you paper name in papers.txt file , each paper on different lines ... then click run to retrive the biblography code for latex
