@@ -389,58 +389,142 @@ function downloadBib() {
 // FILE UPLOAD
 // ===========================
 
+// ===========================
+// FILE UPLOAD - UPDATED
+// ===========================
+
 function handleFileUpload(event) {
-    const file = event.target.files[0];
+    let file;
+
+    // Handle both direct file input and drag/drop
+    if (event.type === 'drop') {
+        file = event.dataTransfer.files[0];
+        elements.fileInput.files = event.dataTransfer.files;
+    } else {
+        file = event.target.files[0];
+    }
+
     if (!file) return;
 
-    if (!file.name.endsWith('.txt')) {
+    // Validate file type
+    if (!file.name.toLowerCase().endsWith('.txt')) {
         showToast('Please upload a .txt file', 'error');
+        resetFileInput();
+        return;
+    }
+
+    // Validate file size (max 1MB)
+    if (file.size > 1024 * 1024) {
+        showToast('File too large. Maximum size is 1MB.', 'error');
+        resetFileInput();
         return;
     }
 
     const reader = new FileReader();
+
     reader.onload = (e) => {
-        const content = e.target.result;
-        const lines = content.trim().split('\n').filter(line => line.trim());
+        try {
+            const content = e.target.result;
 
-        elements.paperTitles.value = content;
-        elements.fileName.textContent = file.name;
-        elements.fileCount.textContent = lines.length;
-        elements.fileInfo.classList.remove('hidden');
+            // Validate content (basic validation)
+            if (content.length === 0) {
+                showToast('File is empty', 'error');
+                resetFileInput();
+                return;
+            }
 
-        showToast(`Loaded ${lines.length} papers from ${file.name}`, 'success');
+            const lines = content.trim().split('\n')
+                .filter(line => line.trim())
+                .map(line => line.trim());
+
+            if (lines.length === 0) {
+                showToast('No valid titles found in file', 'error');
+                resetFileInput();
+                return;
+            }
+
+            // Update UI
+            elements.paperTitles.value = content;
+            elements.fileName.textContent = file.name;
+            elements.fileCount.textContent = `${lines.length} paper${lines.length !== 1 ? 's' : ''}`;
+            elements.fileInfo.classList.remove('hidden');
+
+            // Switch to input tab
+            switchTab('input');
+
+            showToast(`Loaded ${lines.length} papers from ${file.name}`, 'success');
+
+        } catch (error) {
+            console.error('Error reading file:', error);
+            showToast('Error reading file', 'error');
+            resetFileInput();
+        }
     };
+
     reader.onerror = () => {
         showToast('Failed to read file', 'error');
+        resetFileInput();
     };
+
     reader.readAsText(file);
+}
+
+function resetFileInput() {
+    elements.fileInput.value = '';
+    if (elements.fileInfo) {
+        elements.fileInfo.classList.add('hidden');
+    }
 }
 
 // Drag and drop support
 elements.fileUploadArea.addEventListener('dragover', (e) => {
     e.preventDefault();
-    elements.fileUploadArea.style.borderColor = 'var(--primary)';
-    elements.fileUploadArea.style.background = 'rgba(67, 97, 238, 0.05)';
+    e.stopPropagation();
+    elements.fileUploadArea.classList.add('dragover');
 });
 
 elements.fileUploadArea.addEventListener('dragleave', (e) => {
     e.preventDefault();
-    elements.fileUploadArea.style.borderColor = '';
-    elements.fileUploadArea.style.background = '';
+    e.stopPropagation();
+    elements.fileUploadArea.classList.remove('dragover');
 });
 
 elements.fileUploadArea.addEventListener('drop', (e) => {
     e.preventDefault();
-    elements.fileUploadArea.style.borderColor = '';
-    elements.fileUploadArea.style.background = '';
+    e.stopPropagation();
+    elements.fileUploadArea.classList.remove('dragover');
 
     const file = e.dataTransfer.files[0];
     if (file) {
-        elements.fileInput.files = e.dataTransfer.files;
-        handleFileUpload({ target: elements.fileInput });
+        handleFileUpload(e);
     }
 });
 
+// Click to upload
+elements.fileUploadArea.addEventListener('click', (e) => {
+    // Don't trigger if clicking on the file input itself
+    if (e.target !== elements.fileInput) {
+        elements.fileInput.click();
+    }
+});
+
+// File input change
+elements.fileInput.addEventListener('change', handleFileUpload);
+
+// Clear file button
+elements.clearFile.addEventListener('click', (e) => {
+    e.stopPropagation();
+    resetFileInput();
+    showToast('File cleared', 'info');
+});
+
+// Add keyboard support for file upload area
+elements.fileUploadArea.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        elements.fileInput.click();
+    }
+});
 // ===========================
 // SETTINGS
 // ===========================
@@ -545,7 +629,30 @@ elements.privacyModal.addEventListener('click', (e) => {
 // Mobile menu toggle
 elements.menuToggle.addEventListener('click', () => {
     const navLinks = document.querySelector('.nav-links');
-    navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+    navLinks.classList.toggle('show');
+    document.body.classList.toggle('menu-open');
+});
+
+// Close mobile menu when clicking outside
+document.addEventListener('click', (e) => {
+    const navLinks = document.querySelector('.nav-links');
+    const menuToggle = elements.menuToggle;
+
+    if (navLinks.classList.contains('show') &&
+        !navLinks.contains(e.target) &&
+        !menuToggle.contains(e.target)) {
+        navLinks.classList.remove('show');
+        document.body.classList.remove('menu-open');
+    }
+});
+
+// Close mobile menu when clicking a link
+document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+        const navLinks = document.querySelector('.nav-links');
+        navLinks.classList.remove('show');
+        document.body.classList.remove('menu-open');
+    });
 });
 
 // Smooth scrolling for navigation

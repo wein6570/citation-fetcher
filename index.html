@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="Free online tool to generate BibTeX citations for academic papers from Crossref and ArXiv APIs">
     <title>Citation Fetcher - Free BibTeX Generator</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="icon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="apple-touch-icon" href="icon.png">
+    <meta name="theme-color" content="#4361ee">
 </head>
 <body>
     <!-- Header -->
@@ -25,10 +27,10 @@
                     <a href="#how-to" class="nav-link">How To</a>
                     <a href="#api" class="nav-link">API Info</a>
                     <a href="https://github.com/hhhpraise/citation-fetcher" target="_blank" class="github-btn">
-                        <i class="fab fa-github"></i> GitHub
+                        <i class="fab fa-github"></i> <span class="github-text">GitHub</span>
                     </a>
                 </div>
-                <button class="menu-toggle" id="menuToggle">
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
                     <i class="fas fa-bars"></i>
                 </button>
             </nav>
@@ -71,7 +73,7 @@
                         <i class="fas fa-quote-left"></i>
                         <p>Saved me hours of manual citation work!</p>
                         <div class="user">
-                            <img src="https://i.pravatar.cc/40?img=1" alt="User">
+                            <img src="https://i.pravatar.cc/40?img=1" alt="User" width="40" height="40">
                             <div>
                                 <h4>Dr. Praise O. Arowolo</h4>
                                 <p>Researcher, XAUAT-China</p>
@@ -88,7 +90,7 @@
         <div class="container">
             <div class="tool-container">
                 <div class="tool-header">
-                    <h2><i class="fas fa-magic"></i> Citation Generator</h2>
+                    <h2><i class="fas fa-magic"></i> <span class="tool-header-text">Citation Generator</span></h2>
                     <div class="tool-tabs">
                         <button class="tab-btn active" data-tab="input">Input Papers</button>
                         <button class="tab-btn" data-tab="results">Results</button>
@@ -108,22 +110,32 @@
 Example:
 Attention Is All You Need
 BERT: Pre-training of Deep Bidirectional Transformers
-ResNet: Deep Residual Learning for Image Recognition"></textarea>
+ResNet: Deep Residual Learning for Image Recognition" aria-label="Paper titles input"></textarea>
                         </div>
                         <div class="method-card" id="method-file">
                             <i class="fas fa-file-upload"></i>
                             <h3>Upload File</h3>
                             <p>Upload a .txt file with paper titles</p>
-                            <div class="file-upload-area" id="fileUploadArea">
+                            <div class="file-upload-area" id="fileUploadArea" role="button" tabindex="0" aria-label="Upload file area">
                                 <i class="fas fa-cloud-upload-alt"></i>
                                 <p>Drag & drop your file here or</p>
-                                <label for="fileInput" class="file-btn">Choose File</label>
+                                <label for="fileInput" class="file-btn" role="button">
+                                    <i class="fas fa-folder-open"></i> Choose File
+                                </label>
                                 <input type="file" id="fileInput" accept=".txt">
                                 <p class="file-hint">Supports .txt files with one title per line</p>
                             </div>
                             <div id="fileInfo" class="hidden">
-                                <p><i class="fas fa-file"></i> <span id="fileName"></span> (<span id="fileCount"></span> papers)</p>
-                                <button id="clearFile" class="clear-btn"><i class="fas fa-times"></i></button>
+                                <div class="file-info-content">
+                                    <i class="fas fa-file"></i>
+                                    <div class="file-details">
+                                        <span id="fileName" class="file-name"></span>
+                                        <span id="fileCount" class="file-count"></span>
+                                    </div>
+                                </div>
+                                <button id="clearFile" class="clear-btn" aria-label="Clear file">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -248,6 +260,7 @@ ResNet: Deep Residual Learning for Image Recognition"></textarea>
         <div class="container">
             <h2 class="section-title">Why Use Citation Fetcher?</h2>
             <div class="features-grid">
+                <!-- Feature cards remain the same -->
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-robot"></i>
@@ -324,8 +337,8 @@ ResNet: Deep Residual Learning for Image Recognition"></textarea>
                         <h3>Copy & Download</h3>
                         <p>Copy the BibTeX to clipboard or download as a .bib file for your LaTeX document.</p>
                         <div class="step-actions">
-                            <button class="btn-small"><i class="fas fa-copy"></i> Copy</button>
-                            <button class="btn-small btn-primary"><i class="fas fa-download"></i> Download</button>
+                            <button class="btn-small" tabindex="-1"><i class="fas fa-copy"></i> Copy</button>
+                            <button class="btn-small btn-primary" tabindex="-1"><i class="fas fa-download"></i> Download</button>
                         </div>
                     </div>
                 </div>
@@ -388,7 +401,7 @@ ResNet: Deep Residual Learning for Image Recognition"></textarea>
                         <h4>Tool</h4>
                         <a href="#home">Home</a>
                         <a href="#features">Features</a>
-                        <a href="#how-to">How To Use</a>
+                        <a href="#how-to">How To</a>
                         <a href="#api">APIs</a>
                     </div>
                     <div class="footer-column">
@@ -418,7 +431,7 @@ ResNet: Deep Residual Learning for Image Recognition"></textarea>
         <div class="modal-content">
             <div class="modal-header">
                 <h3><i class="fas fa-shield-alt"></i> Privacy Policy</h3>
-                <button class="modal-close" id="closePrivacy">&times;</button>
+                <button class="modal-close" id="closePrivacy" aria-label="Close modal">&times;</button>
             </div>
             <div class="modal-body">
                 <p><strong>No Data Collection</strong></p>
