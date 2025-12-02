@@ -220,7 +220,7 @@ body {
     box-shadow: var(--box-shadow);
     z-index: 1001;
     padding: 20px;
-    max-width: 400px;
+    max-width: 500px;
     border: 2px solid var(--primary);
 }
 
@@ -2338,6 +2338,10 @@ select:focus,
 
 .qr-section.active {
     display: block;
+
+}
+[data-theme="dark"] .payment-option.active {
+    color: black;
 }
 
 .qr-image-container {
