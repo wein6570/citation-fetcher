@@ -1607,17 +1607,13 @@ function initQRPayment() {
 
     // Enhanced deep links for mobile apps
     function getAlipayDeepLink() {
-        // Alipay deep link format for payment
-        // Use your actual Alipay payment link or user ID
-        const alipayUserId = " "; // Replace with your actual Alipay ID
-        return `alipayqr:https://qr.alipay.com/fkx16106w3omw7w12ftgk9d`;
-    }
+      const qrCodeUrl = 'https://qr.alipay.com/fkx16106w3omw7w12ftgk9d';
+      return `alipayqr://platformapi/startapp?saId=10000007&qrcode=${encodeURIComponent(qrCodeUrl)}`;
+  }
 
-    function getWeChatDeepLink() {
-        // WeChat deep link for adding contact (with your WeChat ID)
-        const wechatId = " "; // Replace with your actual WeChat ID
-        return `weixin:https://u.wechat.com/MKQtNLWjzU-yLfCjSA-xfFc?s=2`;
-    }
+  function getWeChatDeepLink() {
+      return 'https://u.wechat.com/MKQtNLWjzU-yLfCjSA-xfFc?s=2';
+  }
 
     // Open Alipay for payment
     function openAlipayPayment() {
