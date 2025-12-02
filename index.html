@@ -11,8 +11,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Mono:wght@300;400&display=swap" rel="stylesheet">
     <link rel="apple-touch-icon" href="icon.png">
     <meta name="theme-color" content="#4361ee">
+    <!-- Manifest for PWA -->
+    <link rel="manifest" href="manifest.json">
 </head>
-<body>
+<body data-theme="light">
+    <!-- Skip to content link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
     <!-- Header -->
     <header class="header">
         <div class="container">
@@ -26,9 +31,18 @@
                     <a href="#features" class="nav-link">Features</a>
                     <a href="#how-to" class="nav-link">How To</a>
                     <a href="#api" class="nav-link">API Info</a>
-                    <a href="https://github.com/hhhpraise/citation-fetcher" target="_blank" class="github-btn">
-                        <i class="fab fa-github"></i> <span class="github-text">GitHub</span>
+                    <a href="#history" class="nav-link" id="historyNavLink">
+                        <i class="fas fa-history"></i> History
                     </a>
+                    <div class="header-actions">
+                        <button class="dark-mode-toggle" id="darkModeToggle" aria-label="Toggle dark mode">
+                            <i class="fas fa-moon"></i>
+                            <span class="toggle-text">Dark Mode</span>
+                        </button>
+                        <a href="https://github.com/hhhpraise/citation-fetcher" target="_blank" class="github-btn">
+                            <i class="fab fa-github"></i> <span class="github-text">GitHub</span>
+                        </a>
+                    </div>
                 </div>
                 <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
                     <i class="fas fa-bars"></i>
@@ -37,6 +51,40 @@
         </div>
     </header>
 
+    <!-- Keyboard Shortcuts Help -->
+    <div class="keyboard-help hidden" id="keyboardHelp">
+        <div class="keyboard-help-content">
+            <h3><i class="fas fa-keyboard"></i> Keyboard Shortcuts</h3>
+            <div class="shortcuts-grid">
+                <div class="shortcut-item">
+                    <kbd>Ctrl</kbd> + <kbd>Enter</kbd>
+                    <span>Generate Citations</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Ctrl</kbd> + <kbd>S</kbd>
+                    <span>Settings</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Ctrl</kbd> + <kbd>H</kbd>
+                    <span>Toggle History</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Escape</kbd>
+                    <span>Clear All</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Ctrl</kbd> + <kbd>D</kbd>
+                    <span>Toggle Dark Mode</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>?</kbd>
+                    <span>Show/Hide Help</span>
+                </div>
+            </div>
+            <button class="btn-small" id="closeKeyboardHelp">Close</button>
+        </div>
+    </div>
+
     <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="container">
@@ -44,6 +92,10 @@
                 <div class="hero-text">
                     <h2>Generate BibTeX Citations <span class="highlight">Instantly</span></h2>
                     <p class="subtitle">Automatically fetch properly formatted BibTeX citations for your academic papers from Crossref and ArXiv APIs</p>
+                    <div class="paper-counter">
+                        <i class="fas fa-file-alt"></i>
+                        <span id="paperCount">0 papers ready</span>
+                    </div>
                     <div class="hero-stats">
                         <div class="stat">
                             <i class="fas fa-bolt"></i>
@@ -67,11 +119,24 @@
                             </div>
                         </div>
                     </div>
+                    <div class="hero-actions">
+                        <button class="btn-primary" onclick="switchTab('input')">
+                            <i class="fas fa-play"></i> Start Generating
+                        </button>
+                        <button class="btn-secondary" onclick="loadExample()">
+                            <i class="fas fa-eye"></i> Try Example
+                        </button>
+                    </div>
+                    <div class="built-by">
+                        <p>Built by <a href="https://hhhpraise.github.io/portfolio/" target="_blank" class="developer-link">
+                            <i class="fas fa-user-circle"></i> Hhhpraise
+                        </a> for researchers worldwide</p>
+                    </div>
                 </div>
                 <div class="hero-image">
                     <div class="floating-card">
                         <i class="fas fa-quote-left"></i>
-                        <p>Saved me hours of manual citation work!</p>
+                        <p>Saved me hours of manual citation work! The smart detection features are amazing.</p>
                         <div class="user">
                             <img src="https://i.pravatar.cc/40?img=1" alt="User" width="40" height="40">
                             <div>
@@ -86,44 +151,71 @@
     </section>
 
     <!-- Main Tool -->
-    <section class="tool-section">
+    <section class="tool-section" id="main-content">
         <div class="container">
             <div class="tool-container">
                 <div class="tool-header">
                     <h2><i class="fas fa-magic"></i> <span class="tool-header-text">Citation Generator</span></h2>
-                    <div class="tool-tabs">
-                        <button class="tab-btn active" data-tab="input">Input Papers</button>
-                        <button class="tab-btn" data-tab="results">Results</button>
-                        <button class="tab-btn" data-tab="settings">Settings</button>
+                    <div class="tool-actions">
+                        <button class="keyboard-help-btn" id="showKeyboardHelp" title="Keyboard shortcuts">
+                            <i class="fas fa-keyboard"></i>
+                        </button>
+                        <div class="tool-tabs">
+                            <button class="tab-btn active" data-tab="input">Input Papers</button>
+                            <button class="tab-btn" data-tab="results">Results</button>
+                            <button class="tab-btn" data-tab="history">History</button>
+                            <button class="tab-btn" data-tab="settings">Settings</button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Input Tab -->
                 <div class="tab-content active" id="input-tab">
+                    <div class="input-header">
+                        <div class="input-type-selector">
+                            <button class="input-type-btn active" data-type="titles">
+                                <i class="fas fa-font"></i> Titles
+                            </button>
+                            <button class="input-type-btn" data-type="doi">
+                                <i class="fas fa-link"></i> DOIs
+                            </button>
+                            <button class="input-type-btn" data-type="arxiv">
+                                <i class="fas fa-atom"></i> arXiv IDs
+                            </button>
+                        </div>
+                        <div class="input-stats">
+                            <span id="inputTypeIndicator">Detecting titles...</span>
+                            <span id="inputCount">0 items</span>
+                        </div>
+                    </div>
                     <div class="input-methods">
                         <div class="method-card" id="method-text">
                             <i class="fas fa-paste"></i>
-                            <h3>Paste Titles</h3>
-                            <p>Copy and paste paper titles (one per line)</p>
-                            <textarea id="paperTitles" placeholder="Paste your paper titles here, one per line...
+                            <h3>Paste Input</h3>
+                            <p>Copy and paste (one per line)</p>
+                            <textarea id="paperInput" placeholder="Paste your input here, one per line...
 
-Example:
-Attention Is All You Need
-BERT: Pre-training of Deep Bidirectional Transformers
-ResNet: Deep Residual Learning for Image Recognition" aria-label="Paper titles input"></textarea>
+Examples:
+- Titles: Attention Is All You Need
+- DOIs: 10.48550/arXiv.1706.03762
+- arXiv IDs: 1706.03762" aria-label="Paper input"></textarea>
+                            <div class="input-hint">
+                                <i class="fas fa-lightbulb"></i>
+                                <span>We automatically detect the type of input (titles, DOIs, or arXiv IDs)</span>
+                            </div>
                         </div>
                         <div class="method-card" id="method-file">
                             <i class="fas fa-file-upload"></i>
                             <h3>Upload File</h3>
-                            <p>Upload a .txt file with paper titles</p>
+                            <p>Upload .txt, .pdf, or .bib files</p>
                             <div class="file-upload-area" id="fileUploadArea" role="button" tabindex="0" aria-label="Upload file area">
                                 <i class="fas fa-cloud-upload-alt"></i>
                                 <p>Drag & drop your file here or</p>
                                 <label for="fileInput" class="file-btn" role="button">
                                     <i class="fas fa-folder-open"></i> Choose File
                                 </label>
-                                <input type="file" id="fileInput" accept=".txt">
-                                <p class="file-hint">Supports .txt files with one title per line</p>
+                                <input type="file" id="fileInput" accept=".txt,.pdf,.bib">
+                                <p class="file-hint">Supports .txt, .pdf, and .bib files</p>
                             </div>
                             <div id="fileInfo" class="hidden">
                                 <div class="file-info-content">
@@ -150,19 +242,35 @@ ResNet: Deep Residual Learning for Image Recognition" aria-label="Paper titles i
                         <button id="clearBtn" class="btn-outline">
                             <i class="fas fa-trash"></i> Clear All
                         </button>
+                        <button id="undoBtn" class="btn-outline" disabled>
+                            <i class="fas fa-undo"></i> Undo
+                        </button>
                     </div>
                 </div>
 
                 <!-- Results Tab -->
                 <div class="tab-content" id="results-tab">
                     <div class="results-header">
-                        <h3><i class="fas fa-file-code"></i> Generated BibTeX</h3>
+                        <h3><i class="fas fa-file-code"></i> Generated Citations</h3>
                         <div class="result-actions">
+                            <div class="export-format">
+                                <select id="exportFormat">
+                                    <option value="bibtex">BibTeX</option>
+                                    <option value="apa">APA</option>
+                                    <option value="mla">MLA</option>
+                                    <option value="chicago">Chicago</option>
+                                    <option value="harvard">Harvard</option>
+                                    <option value="plain">Plain Text</option>
+                                </select>
+                            </div>
                             <button id="copyBtn" class="btn-secondary">
-                                <i class="fas fa-copy"></i> Copy All
+                                <i class="fas fa-copy"></i> Copy
                             </button>
                             <button id="downloadBtn" class="btn-primary">
-                                <i class="fas fa-download"></i> Download .bib
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                            <button id="shareBtn" class="btn-outline">
+                                <i class="fas fa-share"></i> Share
                             </button>
                         </div>
                     </div>
@@ -179,10 +287,39 @@ ResNet: Deep Residual Learning for Image Recognition" aria-label="Paper titles i
                             <i class="fas fa-clock"></i>
                             <span>Time: <span id="timeElapsed">0s</span></span>
                         </div>
+                        <div class="stat-item">
+                            <i class="fas fa-database"></i>
+                            <span>Source: <span id="sourceStats">-</span></span>
+                        </div>
                     </div>
                     <div class="results-container">
-                        <pre id="bibtexOutput">% Your generated citations will appear here
+                        <div class="results-tabs">
+                            <button class="results-tab-btn active" data-view="bibtex">
+                                <i class="fas fa-code"></i> BibTeX
+                            </button>
+                            <button class="results-tab-btn" data-view="preview">
+                                <i class="fas fa-eye"></i> Preview
+                            </button>
+                            <button class="results-tab-btn" data-view="raw">
+                                <i class="fas fa-file-alt"></i> Raw Data
+                            </button>
+                        </div>
+                        <div class="results-content">
+                            <div class="result-view active" id="bibtexView">
+                                <pre id="bibtexOutput">% Your generated citations will appear here
 % Process papers to see results</pre>
+                            </div>
+                            <div class="result-view" id="previewView">
+                                <div class="citation-preview">
+                                    <div class="preview-list" id="citationPreview">
+                                        <!-- Formatted citations will appear here -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="result-view" id="rawView">
+                                <pre id="rawDataOutput">% Raw data will appear here</pre>
+                            </div>
+                        </div>
                         <div class="progress-container hidden" id="progressContainer">
                             <div class="progress-header">
                                 <h4><i class="fas fa-sync fa-spin"></i> Processing Papers...</h4>
@@ -192,6 +329,51 @@ ResNet: Deep Residual Learning for Image Recognition" aria-label="Paper titles i
                                 <div class="progress-fill" id="progressFill"></div>
                             </div>
                             <div class="current-paper" id="currentPaper"></div>
+                            <div class="retry-queue hidden" id="retryQueue">
+                                <i class="fas fa-redo"></i>
+                                <span id="retryCount">0</span> items will be retried
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Tab -->
+                <div class="tab-content" id="history-tab">
+                    <div class="history-header">
+                        <h3><i class="fas fa-history"></i> Citation History</h3>
+                        <div class="history-actions">
+                            <button id="clearHistory" class="btn-outline">
+                                <i class="fas fa-trash"></i> Clear History
+                            </button>
+                            <button id="exportHistory" class="btn-secondary">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                        </div>
+                    </div>
+                    <div class="history-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-save"></i>
+                            <span>Saved: <span id="historyCount">0</span> citations</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>Last: <span id="lastHistoryDate">Never</span></span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Success Rate: <span id="historySuccessRate">0%</span></span>
+                        </div>
+                    </div>
+                    <div class="history-container">
+                        <div class="history-list" id="historyList">
+                            <div class="empty-history">
+                                <i class="fas fa-history fa-3x"></i>
+                                <h4>No History Yet</h4>
+                                <p>Your fetched citations will appear here for quick access</p>
+                                <button class="btn-primary" onclick="switchTab('input')">
+                                    <i class="fas fa-plus"></i> Start Generating
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -228,6 +410,10 @@ ResNet: Deep Residual Learning for Image Recognition" aria-label="Paper titles i
                                     <input type="radio" name="apiPriority" value="arxiv">
                                     ArXiv (faster for preprints)
                                 </label>
+                                <label>
+                                    <input type="radio" name="apiPriority" value="auto">
+                                    Auto-detect
+                                </label>
                             </div>
                         </div>
                         <div class="setting-card">
@@ -247,8 +433,51 @@ ResNet: Deep Residual Learning for Image Recognition" aria-label="Paper titles i
                                     <input type="checkbox" id="includeComments" checked>
                                     Include helpful comments
                                 </label>
+                                <label>
+                                    <input type="checkbox" id="autoSaveHistory" checked>
+                                    Auto-save to history
+                                </label>
                             </div>
                         </div>
+                        <div class="setting-card">
+                            <i class="fas fa-book"></i>
+                            <h4>Retry Failed</h4>
+                            <p>Number of retry attempts</p>
+                            <div class="slider-container">
+                                <input type="range" id="retrySlider" min="0" max="3" step="1" value="1">
+                                <span id="retryValue">1 retry</span>
+                            </div>
+                        </div>
+                        <div class="setting-card">
+                            <i class="fas fa-cogs"></i>
+                            <h4>Advanced Settings</h4>
+                            <div class="checkbox-group">
+                                <label>
+                                    <input type="checkbox" id="enableDarkMode">
+                                    Enable dark mode
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="enableShortcuts" checked>
+                                    Enable keyboard shortcuts
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="enableAnalytics">
+                                    Send anonymous usage data
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="enableOffline" checked>
+                                    Enable offline mode
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings-actions">
+                        <button id="resetSettings" class="btn-outline">
+                            <i class="fas fa-redo"></i> Reset to Defaults
+                        </button>
+                        <button id="saveSettings" class="btn-primary">
+                            <i class="fas fa-save"></i> Save Settings
+                        </button>
                     </div>
                 </div>
             </div>
@@ -260,7 +489,6 @@ ResNet: Deep Residual Learning for Image Recognition" aria-label="Paper titles i
         <div class="container">
             <h2 class="section-title">Why Use Citation Fetcher?</h2>
             <div class="features-grid">
-                <!-- Feature cards remain the same -->
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-robot"></i>
@@ -272,8 +500,8 @@ ResNet: Deep Residual Learning for Image Recognition" aria-label="Paper titles i
                     <div class="feature-icon">
                         <i class="fas fa-exchange-alt"></i>
                     </div>
-                    <h3>Dual API Support</h3>
-                    <p>Uses both Crossref and ArXiv APIs for maximum coverage and accuracy.</p>
+                    <h3>Multiple APIs</h3>
+                    <p>Uses Crossref, ArXiv, and Semantic Scholar APIs for maximum coverage.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">
@@ -298,10 +526,10 @@ ResNet: Deep Residual Learning for Image Recognition" aria-label="Paper titles i
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <i class="fas fa-download"></i>
+                        <i class="fas fa-history"></i>
                     </div>
-                    <h3>Instant Download</h3>
-                    <p>Download results as .bib files ready for LaTeX or reference managers.</p>
+                    <h3>Citation History</h3>
+                    <p>Save and manage your citation history for future reference.</p>
                 </div>
             </div>
         </div>
@@ -316,8 +544,8 @@ ResNet: Deep Residual Learning for Image Recognition" aria-label="Paper titles i
                     <div class="step-number">1</div>
                     <div class="step-content">
                         <h3>Prepare Your Papers</h3>
-                        <p>Gather paper titles you need citations for. You can paste them directly or upload a text file.</p>
-                        <code>Attention Is All You Need\nBERT: Pre-training of...\nResNet: Deep Residual...</code>
+                        <p>Gather paper titles, DOIs, or arXiv IDs. You can paste them directly or upload a file.</p>
+                        <code>Attention Is All You Need\n10.48550/arXiv.1706.03762\n1706.03762v5</code>
                     </div>
                 </div>
                 <div class="step">
@@ -327,7 +555,7 @@ ResNet: Deep Residual Learning for Image Recognition" aria-label="Paper titles i
                         <p>Click "Generate Citations" and watch as we fetch BibTeX entries from academic databases.</p>
                         <div class="step-image">
                             <i class="fas fa-sync fa-spin"></i>
-                            <span>Fetching from Crossref API...</span>
+                            <span>Smart detection in progress...</span>
                         </div>
                     </div>
                 </div>
@@ -335,10 +563,11 @@ ResNet: Deep Residual Learning for Image Recognition" aria-label="Paper titles i
                     <div class="step-number">3</div>
                     <div class="step-content">
                         <h3>Copy & Download</h3>
-                        <p>Copy the BibTeX to clipboard or download as a .bib file for your LaTeX document.</p>
+                        <p>Copy the BibTeX to clipboard, download in various formats, or share with colleagues.</p>
                         <div class="step-actions">
                             <button class="btn-small" tabindex="-1"><i class="fas fa-copy"></i> Copy</button>
                             <button class="btn-small btn-primary" tabindex="-1"><i class="fas fa-download"></i> Download</button>
+                            <button class="btn-small btn-outline" tabindex="-1"><i class="fas fa-share"></i> Share</button>
                         </div>
                     </div>
                 </div>
@@ -383,6 +612,22 @@ ResNet: Deep Residual Learning for Image Recognition" aria-label="Paper titles i
                         <i class="fas fa-external-link-alt"></i> Visit ArXiv API
                     </a>
                 </div>
+                <div class="api-card semantic">
+                    <div class="api-header">
+                        <i class="fas fa-brain"></i>
+                        <h3>Semantic Scholar</h3>
+                        <span class="api-badge">Alternative</span>
+                    </div>
+                    <p>AI-powered academic search engine with comprehensive coverage.</p>
+                    <ul>
+                        <li><i class="fas fa-check"></i> AI-powered recommendations</li>
+                        <li><i class="fas fa-check"></i> Citation graphs</li>
+                        <li><i class="fas fa-check"></i> Abstract analysis</li>
+                    </ul>
+                    <a href="https://api.semanticscholar.org/" target="_blank" class="api-link">
+                        <i class="fas fa-external-link-alt"></i> Visit Semantic Scholar API
+                    </a>
+                </div>
             </div>
         </div>
     </section>
@@ -395,6 +640,12 @@ ResNet: Deep Residual Learning for Image Recognition" aria-label="Paper titles i
                     <i class="fas fa-graduation-cap"></i>
                     <h2>Citation<span>Fetcher</span></h2>
                     <p>Free tool for academic researchers</p>
+                    <div class="app-version">
+                        <span id="appVersion">v2.0.0</span>
+                        <span class="offline-status" id="offlineStatus">
+                            <i class="fas fa-wifi"></i> Online
+                        </span>
+                    </div>
                 </div>
                 <div class="footer-links">
                     <div class="footer-column">
@@ -403,6 +654,7 @@ ResNet: Deep Residual Learning for Image Recognition" aria-label="Paper titles i
                         <a href="#features">Features</a>
                         <a href="#how-to">How To</a>
                         <a href="#api">APIs</a>
+                        <a href="#history" id="footerHistoryLink">History</a>
                     </div>
                     <div class="footer-column">
                         <h4>Resources</h4>
@@ -410,47 +662,93 @@ ResNet: Deep Residual Learning for Image Recognition" aria-label="Paper titles i
                         <a href="https://github.com/hhhpraise/citation-fetcher/issues" target="_blank">Report Issues</a>
                         <a href="https://github.com/hhhpraise/citation-fetcher/wiki" target="_blank">Documentation</a>
                         <a href="#" id="privacyLink">Privacy Policy</a>
+                        <a href="#" id="keyboardShortcutsLink">Keyboard Shortcuts</a>
                     </div>
-                    <!-- In the footer Connect section, update to: -->
-<div class="footer-column">
-    <h4>Connect</h4>
-    <a href="https://hhhpraise.github.io/portfolio/" target="_blank" class="portfolio-link">
-        <i class="fas fa-user-circle"></i> Developer Portfolio
-    </a>
-    <a href="https://twitter.com/ArowoloPraise" target="_blank">
-        <i class="fab fa-twitter"></i> Twitter
-    </a>
-    <a href="https://github.com/hhhpraise" target="_blank">
-        <i class="fab fa-github"></i> GitHub
-    </a>
-    <a href="mailto:praisemail33@gmail.com">
-        <i class="fas fa-envelope"></i> Email
-    </a>
-</div>
-                </div>
+                    <div class="footer-column">
+                        <h4>Connect</h4>
+                        <a href="https://hhhpraise.github.io/portfolio/" target="_blank" class="portfolio-link">
+                            <i class="fas fa-user-circle"></i> Developer Portfolio
+                        </a>
+                        <a href="https://twitter.com/ArowoloPraise" target="_blank">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="https://github.com/hhhpraise" target="_blank">
+                            <i class="fab fa-github"></i> GitHub
+                        </a>
+                        <a href="mailto:praisemail33@gmail.com">
+                            <i class="fas fa-envelope"></i> Email
+                        </a>
+                    </div>
                 </div>
             </div>
+
             <div class="developer-section">
-    <div class="developer-card">
-        <div class="developer-avatar">
-            <img src="https://github.com/Hhhpraise.png" alt="hhhpraise" width="60" height="60">
-        </div>
-        <div class="developer-info">
-            <h4>Meet the Developer</h4>
-            <p>Created by <strong>Hhhpraise</strong>, a passionate developer and researcher</p>
-            <a href="https://hhhpraise.github.io/portfolio/" target="_blank" class="btn-portfolio">
-                <i class="fas fa-external-link-alt"></i> View Full Portfolio
-            </a>
-        </div>
-    </div>
-</div>
+                <div class="developer-card">
+                    <div class="developer-avatar">
+                        <img src="https://github.com/Hhhpraise.png" alt="hhhpraise" width="60" height="60">
+                    </div>
+                    <div class="developer-info">
+                        <h4>Meet the Developer</h4>
+                        <p>Created by <strong>Hhhpraise</strong>, a passionate developer and researcher</p>
+                        <div class="developer-links">
+                            <a href="https://hhhpraise.github.io/portfolio/" target="_blank" class="btn-portfolio">
+                                <i class="fas fa-external-link-alt"></i> View Full Portfolio
+                            </a>
+                            <button class="btn-outline" id="donateBtn">
+                                <i class="fas fa-coffee"></i> Buy me a coffee
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Newsletter Section -->
+            <div class="newsletter-section">
+                <h4><i class="fas fa-newspaper"></i> Stay Updated</h4>
+                <p>Get tips, updates, and new features in your inbox</p>
+                <form id="newsletterForm">
+                    <input type="email" placeholder="Your email address" required>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-paper-plane"></i> Subscribe
+                    </button>
+                </form>
+                <small>No spam, unsubscribe anytime</small>
+            </div>
 
             <div class="footer-bottom">
-                <p>© 2025 Citation Fetcher. An open-source project. Not affiliated with Crossref or ArXiv.</p>
+                <p>© 2025 Citation Fetcher v2.0. An open-source project. Not affiliated with Crossref or ArXiv.</p>
                 <p>Made with <i class="fas fa-heart"></i> for researchers worldwide</p>
             </div>
         </div>
     </footer>
+
+    <!-- Portfolio Badge -->
+    <div class="portfolio-badge">
+        <a href="https://hhhpraise.github.io/portfolio/" target="_blank">
+            <i class="fas fa-user-circle"></i>
+            <span>View Portfolio</span>
+        </a>
+    </div>
+
+    <!-- Dark Mode Toggle Floating -->
+    <button class="dark-mode-toggle-floating" id="darkModeToggleFloating" aria-label="Toggle dark mode">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- Install App Prompt -->
+    <div class="install-prompt hidden" id="installPrompt">
+        <div class="install-prompt-content">
+            <i class="fas fa-download"></i>
+            <div>
+                <h4>Install Citation Fetcher</h4>
+                <p>Install our app for offline use and quick access</p>
+            </div>
+            <div class="install-actions">
+                <button class="btn-outline" id="installLater">Later</button>
+                <button class="btn-primary" id="installNow">Install</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Privacy Modal -->
     <div class="modal hidden" id="privacyModal">
@@ -470,7 +768,10 @@ ResNet: Deep Residual Learning for Image Recognition" aria-label="Paper titles i
                 <p>ArXiv API requests are anonymous and do not require any identification.</p>
 
                 <p><strong>Local Storage</strong></p>
-                <p>We only store your preferences (like email and delay settings) locally in your browser.</p>
+                <p>We only store your preferences (like email and delay settings) locally in your browser. You can clear this anytime from settings.</p>
+
+                <p><strong>Offline Functionality</strong></p>
+                <p>The app can work offline after first visit. No data is sent to external servers when offline.</p>
             </div>
         </div>
     </div>
@@ -478,7 +779,142 @@ ResNet: Deep Residual Learning for Image Recognition" aria-label="Paper titles i
     <!-- Toast Notifications -->
     <div class="toast-container" id="toastContainer"></div>
 
+    <!-- Accessible Live Region for Screen Readers -->
+    <div aria-live="polite" aria-atomic="true" class="sr-only" id="liveRegion"></div>
+
     <!-- Scripts -->
     <script src="script.js"></script>
+    <script src="service-worker.js"></script>
+
+<!-- QR Code Modal -->
+<div class="modal hidden" id="qrModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-qrcode"></i> Support via QR Code</h3>
+            <button class="modal-close" id="closeQR">&times;</button>
+        </div>
+        <div class="modal-body">
+            <!-- Mobile App Detection -->
+            <div class="app-detection hidden" id="appDetection">
+                <div class="detection-content">
+                    <i class="fas fa-mobile-alt"></i>
+                    <div>
+                        <h4>Opening Payment App...</h4>
+                        <p id="detectionMessage">Attempting to open payment app...</p>
+                        <button class="btn-outline" id="showQRCodeAnyway">Show QR Code Instead</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QR Code Display -->
+            <div class="qr-display" id="qrDisplay">
+                <div class="payment-options">
+                    <div class="payment-option active" data-payment="alipay">
+                        <i class="fab fa-alipay"></i>
+                        <span>Alipay</span>
+                    </div>
+                    <div class="payment-option" data-payment="wechat">
+                        <i class="fab fa-weixin"></i>
+                        <span>WeChat</span>
+                    </div>
+                </div>
+
+                <div class="qr-content">
+                    <!-- Alipay QR -->
+                    <div class="qr-section active" id="alipaySection">
+                        <div class="qr-image-container">
+                            <img src="images/donate/alipay-qr.png" alt="Alipay QR Code" class="qr-image">
+                            <div class="qr-overlay">
+                                <i class="fas fa-expand-alt"></i>
+                                <span>Click to enlarge</span>
+                            </div>
+                        </div>
+                        <div class="qr-instructions">
+                            <h5><i class="fab fa-alipay"></i> Alipay Instructions</h5>
+                            <ol>
+                                <li>Open <strong>Alipay app</strong> on your phone</li>
+                                <li>Tap <strong>"Scan"</strong> (扫一扫)</li>
+                                <li>Point camera at this QR code</li>
+                                <li>Enter amount (any amount is appreciated!)</li>
+                                <li>Add message: <code>Support Citation Fetcher</code></li>
+                                <li>Complete payment</li>
+                            </ol>
+                            <div class="qr-mobile-action">
+                                <button class="btn-primary" id="openAlipay">
+                                    <i class="fab fa-alipay"></i> Open Alipay App
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- WeChat QR -->
+                    <div class="qr-section" id="wechatSection">
+                        <div class="qr-image-container">
+                            <img src="images/donate/wechat-qr.png" alt="WeChat QR Code" class="qr-image">
+                            <div class="qr-overlay">
+                                <i class="fas fa-expand-alt"></i>
+                                <span>Click to enlarge</span>
+                            </div>
+                        </div>
+                        <div class="qr-instructions">
+                            <h5><i class="fab fa-weixin"></i> WeChat Instructions</h5>
+                            <ol>
+                                <li>Open <strong>WeChat app</strong> on your phone</li>
+                                <li>Go to <strong>"Me" → "Wallet" → "Money"</strong></li>
+                                <li>Tap <strong>"Scan"</strong> (扫一扫)</li>
+                                <li>Scan this QR code with camera</li>
+                                <li>Enter any amount you'd like to send</li>
+                                <li>Add note: <code>Support developer</code></li>
+                            </ol>
+                            <div class="qr-mobile-action">
+                                <button class="btn-primary" id="openWeChat">
+                                    <i class="fab fa-weixin"></i> Open WeChat App
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="qr-footer">
+                    <div class="support-note">
+                        <i class="fas fa-heart"></i>
+                        <span>Your support helps improve Citation Fetcher for everyone!</span>
+                    </div>
+                    <div class="qr-actions">
+                        <button class="btn-outline" id="saveQR">
+                            <i class="fas fa-download"></i> Save QR Code
+                        </button>
+                        <button class="btn-outline" id="copyPaymentLink">
+                            <i class="fas fa-copy"></i> Copy Payment Link
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- QR Enlargement Modal -->
+<div class="modal hidden" id="enlargeModal">
+    <div class="modal-content fullscreen">
+        <div class="modal-header">
+            <h3 id="enlargeTitle">QR Code</h3>
+            <button class="modal-close" id="closeEnlarge">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="enlarge-container">
+                <img id="enlargedQR" src="" alt="Enlarged QR Code">
+            </div>
+            <div class="enlarge-actions">
+                <button class="btn-primary" id="downloadEnlarged">
+                    <i class="fas fa-download"></i> Download Full Size
+                </button>
+                <button class="btn-outline" id="closeEnlargeBtn">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
